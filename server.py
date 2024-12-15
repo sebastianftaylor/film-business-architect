@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
@@ -14,7 +14,6 @@ SCOPES = ['https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.
 
 # Function to get credentials
 def get_credentials():
-    # Load token from file
     with open('token.json', 'r') as token_file:
         token_data = json.load(token_file)
 
@@ -27,11 +26,9 @@ def get_credentials():
         scopes=token_data.get('scopes')
     )
 
-    # Refresh token if needed
     if creds.expired and creds.refresh_token:
         creds.refresh(Request())
 
-        # Save updated token
         with open('token.json', 'w') as token_file:
             updated_token_data = {
                 'token': creds.token,
@@ -48,43 +45,46 @@ def get_credentials():
 # Route to create Google Doc
 @app.route('/create-document', methods=['POST'])
 def create_document():
-    """
-    Expects JSON input: { "title": "My New Document", "content": "Hello, world!" }
-    """
     try:
         data = request.get_json(force=True)
         title = data.get('title', 'Untitled Document')
         content = data.get('content', '')
 
         creds = get_credentials()
-
-        # Build Google Docs service
         docs_service = build('docs', 'v1', credentials=creds)
-
-        # Create a new doc
         doc = docs_service.documents().create(body={"title": title}).execute()
         doc_id = doc.get('documentId')
 
-        # Insert content if provided
         if content:
             requests = [{
                 'insertText': {
-                    'location': {
-                        'index': 1
-                    },
+                    'location': {'index': 1},
                     'text': content
                 }
             }]
             docs_service.documents().batchUpdate(documentId=doc_id, body={'requests': requests}).execute()
 
-        # Return the document URL
         doc_url = f"https://docs.google.com/document/d/{doc_id}/edit"
         return jsonify({"documentId": doc_id, "docUrl": doc_url})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Flask entry point
+# Home Route
+@app.route('/', methods=['GET'])
+def home():
+    return "Hello! The server is running."
+
+# Serve OpenAPI Spec
+@app.route('/openapi.yaml', methods=['GET'])
+def openapi_spec():
+    return send_from_directory('.', 'openapi.yaml', mimetype='text/plain')
+
+# Serve AI Plugin Manifest
+@app.route('/ai-plugin.json', methods=['GET'])
+def plugin_manifest():
+    return send_from_directory('.', 'ai-plugin.json', mimetype='application/json')
+
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))  # Default to port 5000 if PORT is not set
+    port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
