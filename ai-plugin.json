@@ -1,19 +1,19 @@
 {
   "schema_version": "v1",
-  "name_for_human": "Film Business Architect",
   "name_for_model": "film_business_architect",
-  "description_for_human": "Create and manage Google Docs for film projects.",
-  "description_for_model": "Use this plugin to create documents in Google Docs.",
+  "name_for_human": "Film Business Architect",
+  "description_for_model": "Create and manage Google Docs for film projects.",
+  "description_for_human": "Automates Google Docs creation for film projects.",
   "auth": {
-    "type": "service_http",
-    "authorization_type": "bearer"
+    "type": "none"
   },
   "api": {
     "type": "openapi",
-    "url": "http://127.0.0.1:5000/openapi.yaml",
-    "is_user_authenticated": true
+    "url": "https://film-business-architect.onrender.com/openapi.yaml",
+    "has_user_authentication": false
   },
-  "logo_url": "http://127.0.0.1:5000/logo.png",
-  "contact_email": "support@example.com",
-  "legal_info_url": "http://127.0.0.1:5000/privacy.html"
+  "logo_url": "https://film-business-architect.onrender.com/logo.png",
+  "contact_email": "your-email@example.com",
+  "legal_info_url": "https://film-business-architect.onrender.com/privacy.html"
 }
+
