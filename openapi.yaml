@@ -1,0 +1,33 @@
+openapi: 3.0.0
+info:
+  title: Film Business Architect API
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:5000
+paths:
+  /create-document:
+    post:
+      summary: Create a new Google Doc
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+      responses:
+        '200':
+          description: The created document details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  documentId:
+                    type: string
+                  docUrl:
+                    type: string
